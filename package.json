@@ -2,13 +2,17 @@
   "name": "prosemirror-track-changes-demo",
   "version": "0.0.0",
   "license": "CC0-1.0",
+  "__comment": "set max-old-space-size=7200 (7200 MByte RAM) to fix out of memory error on node < 15 https://github.com/vitejs/vite/issues/2433",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=7200 vite build",
     "serve": "vite preview"
   },
   "devDependencies": {
-    "vite": "*"
+    "rollup-plugin-file-import": "^1.0.0",
+    "rollup-pluginutils": "^2.8.2",
+    "vite": "*",
+    "cross-env": "*"
   },
   "dependencies": {
     "@vivliostyle/print": "*",
