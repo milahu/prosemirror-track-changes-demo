@@ -1,0 +1,11 @@
+--- node_modules/biblatex-csl-converter/package.json.bak	2021-05-15 13:29:08.478390393 +0200
++++ node_modules/biblatex-csl-converter/package.json	2021-05-15 13:29:24.469284348 +0200
+@@ -3,7 +3,7 @@
+     "version": "2.0.0",
+     "description": "a set of converters: biblatex => json, json => biblatex, json => CSL",
+     "main": "lib/index.js",
+-    "module": "src/index.js",
++    "module": "lib/index.js",
+     "types": "lib/index.d.ts",
+     "repository": {
+         "type": "git",
