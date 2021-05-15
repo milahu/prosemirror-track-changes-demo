@@ -1,27 +1,15 @@
 // prosemirror "track changes" demo with fiduswriter ModTrack
 
-// FIXME delete and replace operations
-//   tr.getMeta('inputType')
-//     is required in
-//     fiduswriter/document/static/js/modules/editor/track/amend_transaction.js
-//   setMeta('inputType'
-//     is called in fiduswriter/document/static/js/modules/editor/keymap.js
-//     but buildEditorKeymap has no effect
+// TODO allow to undelete a selected deletion ("random access undo")
 
-import './style.css'
+import './style.css' // minimal css for fiduswriter ModTrack
+// css classes are defined in
+// fiduswriter/document/static/js/modules/schema/common/track.js
+// fiduswriter/document/static/js/modules/editor/state_plugins/track/plugin.js
 
 import "prosemirror-view/style/prosemirror.css" // set white-space: pre-wrap, etc
 import "prosemirror-menu/style/menu.css"
 import "prosemirror-example-setup/style/style.css" // .ProseMirror-prompt, etc
-
-/* minimal css for fiduswriter ModTrack -> style.css
-  span.approved-insertion {
-    background-color: rgba(0, 255, 0, 0.5);
-  }
-  span.approved-deletion {
-    background-color: rgba(255, 0, 0, 0.5);
-  }
-*/
 
 import {EditorState, Plugin} from "prosemirror-state"
 import {EditorView} from "prosemirror-view"
@@ -29,20 +17,23 @@ import {Schema, DOMParser} from "prosemirror-model"
 import {schema} from "prosemirror-schema-basic"
 import {exampleSetup} from "prosemirror-example-setup"
 
-import { ModTrack, amendTransaction } from "./github.com/fiduswriter/fiduswriter--develop/fiduswriter/document/static/js/modules/editor/track/index.js"
+//import applyDevTools from "prosemirror-dev-tools";
+// dependencies: "prosemirror-dev-tools": "*", "react": "*", "react-dom": "*", "unstated": "*"
+
 
 // needed to show/hide the menuBar on focus/blur
 // https://discuss.prosemirror.net/t/handling-focus-in-plugins/1981/6
 //import { focusPlugin } from "./discuss.prosemirror.net/focus-plugin.js"
 
-import * as FiduswriterSchemaTrack from "./github.com/fiduswriter/fiduswriter--develop/fiduswriter/document/static/js/modules/schema/common/track.js"
-import { trackPlugin } from "./github.com/fiduswriter/fiduswriter--develop/fiduswriter/document/static/js/modules/editor/state_plugins"
-import { buildEditorKeymap } from "./github.com/fiduswriter/fiduswriter--develop/fiduswriter/document/static/js/modules/editor/keymap"
+import { ModTrack, amendTransaction } from "./github.com/fiduswriter/fiduswriter/fiduswriter/document/static/js/modules/editor/track/index.js"
+import { trackPlugin } from "./github.com/fiduswriter/fiduswriter/fiduswriter/document/static/js/modules/editor/state_plugins"
+import * as TrackSchema from "./github.com/fiduswriter/fiduswriter/fiduswriter/document/static/js/modules/schema/common/track.js"
+import { buildEditorKeymap } from "./github.com/fiduswriter/fiduswriter/fiduswriter/document/static/js/modules/editor/keymap"
+import { docSchema } from "./github.com/fiduswriter/fiduswriter/fiduswriter/document/static/js/modules/schema/document"
+
 import { buildKeymap } from "prosemirror-example-setup"
 import { baseKeymap } from "prosemirror-commands"
 import { keymap } from 'prosemirror-keymap'
-
-import { docSchema } from "./github.com/fiduswriter/fiduswriter--develop/fiduswriter/document/static/js/modules/schema/document"
 
 
 
@@ -57,17 +48,17 @@ class TextEditor {
       marks: {
         ...schema.spec.marks,
 
-        insertion: FiduswriterSchemaTrack.insertion,
-        deletion: FiduswriterSchemaTrack.deletion,
-        format_change: FiduswriterSchemaTrack.format_change,
-        // TODO function FiduswriterSchemaTrack.parseTracks ?
+        insertion: TrackSchema.insertion,
+        deletion: TrackSchema.deletion,
+        format_change: TrackSchema.format_change,
+        // TODO function TrackSchema.parseTracks ?
       },
     })
 
     this.schema = {
       //...schema,
-      ...docSchema,
-      //...customSchema,
+      //...docSchema,
+      ...customSchema,
     }
 
     // fiduswriter statePlugins are inited in fiduswriter/document/static/js/modules/editor/collab/doc.js
@@ -83,12 +74,12 @@ class TextEditor {
       schema: docSchema,
       menuBar: true,
       floatingMenu: true,
-    }).filter(p => ( // remove key handlers [quickfix, but no effect]
+    }).filter(p => ( // remove key handlers [quickfix]
       !Boolean(p.props?.handleKeyDown) &&
       !Boolean(p.props?.handleTextInput)
     ));
     this.plugins.push(...examplePlugins);
-    console.log('TextEditor examplePlugins', examplePlugins);
+    //console.log('TextEditor examplePlugins', examplePlugins);
 
     //plugins.push(focusPlugin);
 
@@ -108,6 +99,7 @@ class TextEditor {
     this.mod = {}; // modules
     this.docInfo = {};
     this.docInfo.updated = null;
+    this.docInfo.access_rights = 'write-tracked'; // enable "track changes" for amend_transaction.js
     this.schema = docSchema
     this.view = new EditorView(
       editorElement, {
@@ -117,7 +109,7 @@ class TextEditor {
       }),
       handleDOMEvents: {
         focus: (view, _event) => {
-          console.log(`TextEditor focus`)
+          //console.log(`TextEditor focus`)
           if (!setFocus) {
             this.currentView = this.view
             // We focus once more, as focus may have disappeared due to
@@ -129,7 +121,7 @@ class TextEditor {
         }
       },
       dispatchTransaction: tr => {
-        console.log(`TextEditor dispatchTransaction`)
+        //console.log(`TextEditor dispatchTransaction`)
         const trackedTr = amendTransaction(tr, this.view.state, this)
         const {state: newState, transactions} = this.view.state.applyTransaction(trackedTr)
         this.view.updateState(newState)
@@ -149,10 +141,14 @@ class TextEditor {
     })
     this.currentView = this.view
 
-    // needed by trackPlugin [have a better workaround?]
-    this.mod.footnotes = {};
-    this.mod.footnotes.fnEditor = {};
-    this.mod.footnotes.fnEditor.view = this.view;
+    //applyDevTools(this.view);
+
+    // mock footnote editor. needed by trackPlugin
+    // fiduswriter/document/static/js/modules/editor/state_plugins/track/plugin.js
+    this.mod.footnotes = { fnEditor: { view: {
+      dispatch: () => undefined,
+      state: { tr: { setMeta: function () { return this; } } }
+    }}};
 
     new ModTrack(this);
   }

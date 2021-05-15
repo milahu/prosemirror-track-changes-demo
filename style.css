@@ -2,20 +2,29 @@
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /*
-    text-align: center;
-    color: #2c3e50;
-    margin-top: 60px;
-  */
 }
 
 
-/* minimal css for fiduswriter ModTrack */
 
-span.approved-insertion {
-  background-color: rgba(0, 255, 0, 0.5);
+/* css for fiduswriter ModTrack */
+
+span.insertion,
+span.selected-insertion, /* insertion with focus (clicked) */
+span.approved-insertion
+{
+  background-color: rgba(0, 255, 0, 0.3);
 }
 
-span.approved-deletion {
-  background-color: rgba(255, 0, 0, 0.5);
+span.deletion,
+span.selected-deletion /* deletion with focus (clicked) */
+{
+  background-color: rgba(255, 0, 0, 0.3);
 }
+
+/* note: inconsistent class names: format-change vs selected-format_change */
+span.format-change,
+span.selected-format_change
+{
+  background-color: rgba(0, 255, 255, 0.3);
+}
+
