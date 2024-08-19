@@ -60,7 +60,7 @@ mkdir -p $(dirname $fwdir) || true
 
   # https://github.com/fiduswriter/fiduswriter/wiki/Installation-for-developers
 
-  cp configuration.py-default configuration.py
+  cp configuration-default.py configuration.py
 
   # debian
   which apt >/dev/null && {
