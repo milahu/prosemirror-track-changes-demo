@@ -28,9 +28,6 @@ fwdir=github.com/fiduswriter/fiduswriter
 # citeproc-plus is required by fiduswriter
 [ -d node_modules/citeproc-plus ] || { echo please install npm package citeproc-plus; exit 1; }
 
-[ -d node_modules/biblatex-csl-converter ] || { echo please install npm package biblatex-csl-converter; exit 1; }
-patch -p0 --forward --reject-file=- < patches/biblatex-csl-converter-2.0.0.diff || true # allow to fail
-
 #[ -d node_modules/prosemirror-model ] || { echo please install npm package prosemirror-model; exit 1; }
 ## fix: looks like multiple versions of prosemirror-model were loaded
 ## https://github.com/ueberdosis/tiptap/issues/577
