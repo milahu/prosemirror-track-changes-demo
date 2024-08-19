@@ -33,16 +33,11 @@ fwdir=github.com/fiduswriter/fiduswriter
 ## https://github.com/ueberdosis/tiptap/issues/577
 #prosemirror_model_version=$(cat node_modules/prosemirror-model/package.json | jq -r .version)
 
-# https://github.com/fiduswriter/fiduswriter/pull/1144
-patchfile_path_2="$(readlink -f patches/update-prosemirror-model-to-1.14.1.diff)"
-
 mkdir -p $(dirname $fwdir) || true
 (
   cd $(dirname $fwdir)
   git clone --depth 1 --branch $fiduswriter_branch https://github.com/fiduswriter/fiduswriter.git
   cd fiduswriter
-
-  patch -p1 --forward --reject-file=- <"$patchfile_path_2"
 
   cd fiduswriter
 
