@@ -28,6 +28,7 @@
     "fastdom": "*",
     "fix-utf8": "*",
     "jszip": "*",
+    "mathml2omml": "*",
     "mathlive": "*",
     "orderedmap": "*",
     "pretty": "*",
